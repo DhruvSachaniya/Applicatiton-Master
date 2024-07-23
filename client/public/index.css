@@ -1,0 +1,53 @@
+/* application master */
+
+.first-buttons {
+  padding: 5px 25px 5px 25px;
+  border-radius: 5px;
+  background-color: #77a4ef;
+  margin-left: 1rem;
+  cursor: pointer;
+}
+
+input {
+  /* width: 100%; */
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+select {
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+table {
+  font-family: arial, sans-serif;
+  /* border-collapse: collapse; */
+  /* width: 50%; */
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  border: 1px solid black;
+}
+
+td,
+th {
+  border: 1px solid #f6f6f9;
+  text-align: left;
+  padding: 8px;
+}
+
+/* second page */
+
+.second-div-1 {
+  gap: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
