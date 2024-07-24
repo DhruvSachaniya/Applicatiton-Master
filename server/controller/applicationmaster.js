@@ -18,97 +18,118 @@ export function SaveApplicationData(req, res) {
   } = req.body;
 
   if (APPName.length > 255 || APPName.length < 1) {
-    return res.status(500).json({ message: "Error In Name Field!" });
+    return res.status(400).json({ message: "Error In Name Field!" });
   }
 
-  // Start a transaction
-  db.beginTransaction((err) => {
+  const FindAppName = `
+    SELECT
+      *
+    FROM
+      applicationmaster
+    WHERE
+      APPM_Name = ?
+  `;
+
+  db.query(FindAppName, [APPName], (err, results) => {
     if (err) {
-      return res.status(500).json({ message: "Transaction error", err });
+      console.log(err);
+      return res.status(500).send("Error updating data");
+    }
+    if (results.length > 0) {
+      return res.status(400).send("Name already exists!");
     }
 
-    // Insert into applicationmaster
-    const insertApplicationMaster = `
-      INSERT INTO applicationmaster (APPM_Name, APPM_GA_Release_No, APPM_Status)
-      VALUES (?, ?, ?)
-    `;
-    db.query(
-      insertApplicationMaster,
-      [APPName, VersionNum, Status === "Active" ? 1 : 0],
-      (err, result) => {
-        if (err) {
-          return db.rollback(() => {
-            res
-              .status(500)
-              .json({ message: "Error inserting application master", err });
-          });
-        }
+    // Start a transaction
+    db.beginTransaction((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Transaction error", err });
+      }
 
-        const applicationId = result.insertId;
+      // Insert into applicationmaster
+      const insertApplicationMaster = `
+        INSERT INTO applicationmaster (APPM_Name, APPM_GA_Release_No, APPM_Status)
+        VALUES (?, ?, ?)
+      `;
+      db.query(
+        insertApplicationMaster,
+        [APPName, VersionNum, Status === "Active" ? 1 : 0],
+        (err, result) => {
+          if (err) {
+            return db.rollback(() => {
+              res
+                .status(500)
+                .json({ message: "Error inserting application master", err });
+            });
+          }
 
-        // Insert into applicationversionmaster for each version number
-        const insertApplicationVersionMaster = `
-          INSERT INTO applicationversionmaster (APPVM_APPM_ID, APPVM_GA_Release_No, APPVM_Internal_VersionNo, APPVM_Status)
-          VALUES ?
-        `;
-        const versionValues = internalverlist.map((versionNum2) => [
-          applicationId,
-          VersionNum,
-          versionNum2,
-          Status === "Active" ? 1 : 0,
-        ]);
-        db.query(
-          insertApplicationVersionMaster,
-          [versionValues],
-          (err, result) => {
-            if (err) {
-              return db.rollback(() => {
-                res.status(500).json({
-                  message: "Error inserting application version master",
-                  err,
-                });
-              });
-            }
+          const applicationId = result.insertId;
 
-            // Insert into applicationmodulemaster for each module name
-            const insertApplicationModuleMaster = `
-              INSERT INTO applicationmodulemaster (APPMD_ApplicationID, APPMD_Module_Name)
-              VALUES ?
-            `;
-            const moduleValues = moudlenamelist.map((moduleName) => [
-              applicationId,
-              moduleName,
-            ]);
-            db.query(
-              insertApplicationModuleMaster,
-              [moduleValues],
-              (err, result) => {
-                if (err) {
-                  return db.rollback(() => {
-                    res.status(500).json({
-                      message: "Error inserting application module master",
-                      err,
-                    });
+          // Insert into applicationversionmaster for each version number
+          const insertApplicationVersionMaster = `
+            INSERT INTO applicationversionmaster (APPVM_APPM_ID, APPVM_GA_Release_No, APPVM_Internal_VersionNo, APPVM_Status)
+            VALUES ?
+          `;
+          const versionValues = internalverlist.map((versionNum2) => [
+            applicationId,
+            VersionNum,
+            versionNum2,
+            Status === "Active" ? 1 : 0,
+          ]);
+          db.query(
+            insertApplicationVersionMaster,
+            [versionValues],
+            (err, result) => {
+              if (err) {
+                return db.rollback(() => {
+                  res.status(500).json({
+                    message: "Error inserting application version master",
+                    err,
                   });
-                }
-
-                // Commit the transaction
-                db.commit((err) => {
-                  if (err) {
-                    return db.rollback(() => {
-                      res
-                        .status(500)
-                        .json({ message: "Transaction commit error", err });
-                    });
-                  }
-                  res.status(200).json({ message: "Data saved successfully" });
                 });
               }
-            );
-          }
-        );
-      }
-    );
+
+              // Insert into applicationmodulemaster for each module name
+              const insertApplicationModuleMaster = `
+                INSERT INTO applicationmodulemaster (APPMD_ApplicationID, APPMD_Module_Name)
+                VALUES ?
+              `;
+              const moduleValues = moudlenamelist.map((moduleName) => [
+                applicationId,
+                moduleName,
+              ]);
+              db.query(
+                insertApplicationModuleMaster,
+                [moduleValues],
+                (err, result) => {
+                  if (err) {
+                    return db.rollback(() => {
+                      res.status(500).json({
+                        message: "Error inserting application module master",
+                        err,
+                      });
+                    });
+                  }
+
+                  // Commit the transaction
+                  db.commit((err) => {
+                    if (err) {
+                      return db.rollback(() => {
+                        res
+                          .status(500)
+                          .json({ message: "Transaction commit error", err });
+                      });
+                    }
+                    res
+                      .status(200)
+                      .json({ message: "Data saved successfully" });
+                  });
+                }
+              );
+            }
+          );
+        }
+      );
+    });
   });
 }
 

@@ -1,11 +1,16 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ModuleNameWindow } from "./module.window";
+import { InternalVerWindow } from "./InVer.window";
 
 export function SecondPage() {
   const [applicationData, setApplicationData] = useState([]);
   const [appmodulenameData, setAppModuleNameData] = useState([]);
   const [appinternalverData, setAppInternalVerData] = useState([]);
+
+  const [activemoudle, setActiveModule] = useState(null);
+  const [activeinternalver, setActiveInternalVer] = useState(null);
 
   const navigate = useNavigate();
 
@@ -26,10 +31,15 @@ export function SecondPage() {
 
   async function handleMoudleName(id) {
     try {
-      const response = await axios.get(
-        `http://localhost:3333/application-module/${id}`
-      );
-      setAppModuleNameData(response.data);
+      if (activemoudle === id) {
+        setActiveModule(null);
+      } else {
+        setActiveModule(id);
+        const response = await axios.get(
+          `http://localhost:3333/application-module/${id}`
+        );
+        setAppModuleNameData(response.data);
+      }
     } catch (err) {
       console.log("error to get popup data!", err);
     }
@@ -37,10 +47,15 @@ export function SecondPage() {
 
   async function handleInternalVer(id) {
     try {
-      const response = await axios.get(
-        `http://localhost:3333/application-internal/${id}`
-      );
-      setAppInternalVerData(response.data);
+      if (activeinternalver === id) {
+        setActiveInternalVer(null);
+      } else {
+        setActiveInternalVer(id);
+        const response = await axios.get(
+          `http://localhost:3333/application-internal/${id}`
+        );
+        setAppInternalVerData(response.data);
+      }
     } catch (err) {
       console.log("error to get popup data!", err);
     }
@@ -48,11 +63,13 @@ export function SecondPage() {
 
   async function handleDelete(id) {
     try {
-      const response = await axios.put(
-        `http://localhost:3333/application-status/${id}`
-      );
-      if (response.status === 200) {
-        fetchData();
+      if (window.confirm("do you want to delete it!")) {
+        const response = await axios.put(
+          `http://localhost:3333/application-status/${id}`
+        );
+        if (response.status === 200) {
+          fetchData();
+        }
       }
     } catch (err) {
       console.log("error to delete the data!", err);
@@ -79,12 +96,6 @@ export function SecondPage() {
               {item.APPM_Name}
             </option>
           ))}
-        </select>
-
-        <input type="text" />
-
-        <select name="Status">
-          <option value="">--select--</option>
           {applicationData.map((item, index) => (
             <option key={index} value={item.APPM_GA_Release_No}>
               {item.APPM_GA_Release_No}
@@ -93,6 +104,28 @@ export function SecondPage() {
         </select>
 
         <input type="text" />
+
+        <select name="Status">
+          <option value="">--select--</option>
+          {applicationData.map((item, index) => (
+            <option key={index} value={item.APPM_Name}>
+              {item.APPM_Name}
+            </option>
+          ))}
+          {applicationData.map((item, index) => (
+            <option key={index} value={item.APPM_GA_Release_No}>
+              {item.APPM_GA_Release_No}
+            </option>
+          ))}
+        </select>
+
+        <input type="text" />
+
+        <select name="status">
+          <option value="">--select--</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
       </div>
 
       <div>
@@ -114,21 +147,49 @@ export function SecondPage() {
                 <td>{index + 1}</td>
                 <td>{item.APPM_Name}</td>
                 <td>{item.APPM_GA_Release_No}</td>
-                <td
-                  style={{
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleMoudleName(item.APPM_ID)}
-                >
-                  MoudleName
+                <td>
+                  <div>
+                    <img
+                      onClick={() => handleMoudleName(item.APPM_ID)}
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        cursor: "pointer",
+                      }}
+                      src="https://www.iconpacks.net/icons/2/free-file-icon-1453-thumb.png"
+                      alt="modulename"
+                    />
+                  </div>
+                  {activemoudle === item.APPM_ID && (
+                    <div
+                      style={{
+                        background: "white",
+                        position: "absolute",
+                        left: "28%",
+                      }}
+                    >
+                      <ModuleNameWindow Data={appmodulenameData} />
+                    </div>
+                  )}
                 </td>
-                <td
-                  style={{
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleInternalVer(item.APPM_ID)}
-                >
-                  InternalVersionNum
+                <td>
+                  <img
+                    onClick={() => handleInternalVer(item.APPM_ID)}
+                    style={{ width: "40px", height: "40px", cursor: "pointer" }}
+                    src="https://www.iconpacks.net/icons/2/free-file-icon-1453-thumb.png"
+                    alt="internal"
+                  />
+                  {activeinternalver === item.APPM_ID && (
+                    <div
+                      style={{
+                        background: "white",
+                        position: "absolute",
+                        left: "38%",
+                      }}
+                    >
+                      <InternalVerWindow Data={appinternalverData} />
+                    </div>
+                  )}
                 </td>
                 <td>
                   {item.APPM_Status === 1
@@ -173,7 +234,7 @@ export function SecondPage() {
         </table>
       </div>
 
-      {appmodulenameData.length > 0 && (
+      {/* {appmodulenameData.length > 0 && (
         <div>
           <table>
             <thead>
@@ -192,9 +253,9 @@ export function SecondPage() {
             </tbody>
           </table>
         </div>
-      )}
+      )} */}
 
-      {appinternalverData.length > 0 && (
+      {/* {appinternalverData.length > 0 && (
         <div>
           <table>
             <thead>
@@ -213,7 +274,7 @@ export function SecondPage() {
             </tbody>
           </table>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

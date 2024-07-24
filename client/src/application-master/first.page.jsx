@@ -82,28 +82,38 @@ export function ApplicationMaster() {
 
   function handleAddInternalVersion() {
     if (values.InternalVersionNum && values.VersionNum) {
-      setinternalverlist([
-        ...internalverlist,
-        {
-          no: internalverlist.length + 1,
-          APPVM_Internal_VersionNo: values.InternalVersionNum,
-        },
-      ]);
-      setvalue({ ...values, InternalVersionNum: "" });
+      const isDuplicate = internalverlist.some(
+        (item) => item.APPVM_Internal_VersionNo === values.InternalVersionNum
+      );
+      if (!isDuplicate) {
+        setinternalverlist([
+          ...internalverlist,
+          {
+            no: internalverlist.length + 1,
+            APPVM_Internal_VersionNo: values.InternalVersionNum,
+          },
+        ]);
+        setvalue({ ...values, InternalVersionNum: "" });
+      }
     }
   }
 
   function handleAddMoudleName() {
     if (values.ModuleName && values.VersionNum) {
-      setmoudlenamelist([
-        ...moudlenamelist,
-        {
-          no: moudlenamelist.length + 1,
-          VersionNumber: values.VersionNum,
-          APPMD_Module_Name: values.ModuleName,
-        },
-      ]);
-      setvalue({ ...values, ModuleName: "" });
+      const isDuplicate = moudlenamelist.some(
+        (item) => item.APPMD_Module_Name === values.ModuleName
+      );
+      if (!isDuplicate) {
+        setmoudlenamelist([
+          ...moudlenamelist,
+          {
+            no: moudlenamelist.length + 1,
+            VersionNumber: values.VersionNum,
+            APPMD_Module_Name: values.ModuleName,
+          },
+        ]);
+        setvalue({ ...values, ModuleName: "" });
+      }
     }
   }
 

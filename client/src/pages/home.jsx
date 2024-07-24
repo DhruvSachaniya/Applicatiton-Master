@@ -21,7 +21,8 @@ function Buttons() {
   return (
     <>
       <h1>{th}</h1>
-      <button onClick={() => inqurement()}>+</button>
+
+      <button onClick={() => inqurement()}></button>
       <button>-</button>
     </>
   );
