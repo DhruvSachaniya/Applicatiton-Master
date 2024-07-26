@@ -12,6 +12,9 @@ export function SecondPage() {
   const [activemoudle, setActiveModule] = useState(null);
   const [activeinternalver, setActiveInternalVer] = useState(null);
 
+  const [selectedFirstDropdown, setSelectedFirstDropdown] = useState("");
+  const [selectedSecondDropdown, setSelectedSecondDropdown] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,6 +79,14 @@ export function SecondPage() {
     }
   }
 
+  const handleFirstDropdonwChange = (e) => {
+    setSelectedFirstDropdown(e.target.value);
+  };
+
+  const handleSecondDropdownChange = (e) => {
+    setSelectedSecondDropdown(e.target.value);
+  };
+
   return (
     <div>
       <div className="second-div-1">
@@ -89,34 +100,66 @@ export function SecondPage() {
           Back
         </button>
 
-        <select name="Status">
+        <select
+          name="Status"
+          value={selectedFirstDropdown}
+          onChange={handleFirstDropdonwChange}
+        >
           <option value="">--select--</option>
-          {applicationData.map((item, index) => (
-            <option key={index} value={item.APPM_Name}>
-              {item.APPM_Name}
-            </option>
-          ))}
-          {applicationData.map((item, index) => (
-            <option key={index} value={item.APPM_GA_Release_No}>
-              {item.APPM_GA_Release_No}
-            </option>
-          ))}
+          {applicationData
+            .filter(
+              (item) =>
+                item.APPM_Name !== selectedSecondDropdown &&
+                item.APPM_GA_Release_No !== selectedSecondDropdown
+            )
+            .map((item, index) => (
+              <option key={index} value={item.APPM_Name}>
+                {item.APPM_Name}
+              </option>
+            ))}
+          {applicationData
+            .filter(
+              (item) =>
+                item.APPM_Name !== selectedSecondDropdown &&
+                item.APPM_GA_Release_No !== selectedSecondDropdown
+            )
+            .map((item, index) => (
+              <option key={index} value={item.APPM_GA_Release_No}>
+                {item.APPM_GA_Release_No}
+              </option>
+            ))}
         </select>
 
         <input type="text" />
 
-        <select name="Status">
+        <select
+          name="Status"
+          value={selectedSecondDropdown}
+          onChange={handleSecondDropdownChange}
+        >
           <option value="">--select--</option>
-          {applicationData.map((item, index) => (
-            <option key={index} value={item.APPM_Name}>
-              {item.APPM_Name}
-            </option>
-          ))}
-          {applicationData.map((item, index) => (
-            <option key={index} value={item.APPM_GA_Release_No}>
-              {item.APPM_GA_Release_No}
-            </option>
-          ))}
+          {applicationData
+            .filter(
+              (item) =>
+                item.APPM_Name !== selectedFirstDropdown &&
+                item.APPM_GA_Release_No !== selectedFirstDropdown
+            )
+            .map((item, index) => (
+              <option key={index} value={item.APPM_Name}>
+                {item.APPM_Name}
+              </option>
+            ))}
+          {applicationData
+            .filter(
+              (item) =>
+                item.APPM_Name !== selectedFirstDropdown &&
+                item.APPM_GA_Release_No !== selectedFirstDropdown
+            )
+            .map((item, index) => (
+              <option key={index} value={item.APPM_GA_Release_No}>
+                {item.APPM_GA_Release_No}
+              </option>
+            ))}
         </select>
 
         <input type="text" />
